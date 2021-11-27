@@ -6,9 +6,9 @@
   "scripts": {
     "test": "jest --runInBand --detectOpenHandles --forceExit",
     "start": "node .",
-    "dev": "nodemon .",
+    "dev": "node-dev .",
     "dev:test": "mocha ./src/integration-tests/**/*$NAME*.{test,spec}.js --exit",
-    "dev:test:coverage": "nyc --all npm run dev:test",
+    "dev:test:coverage": "nyc --all --reporter=lcov npm run dev:test",
     "dev:test:coverage:json": "nyc --all --reporter=json-summary npm run dev:test",
     "lint": "eslint --no-inline-config --ext .js,.jsx --no-error-on-unmatched-pattern -c .eslintrc.json ."
   },
@@ -42,6 +42,7 @@
     "eslint-config-trybe-backend": "^1.0.4",
     "mocha": "9.0.0",
     "mongodb-memory-server": "^6.9.6",
+    "node-dev": "^7.1.0",
     "nyc": "15.1.0",
     "sinon": "11.1.1"
   }
