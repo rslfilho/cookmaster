@@ -1,4 +1,5 @@
-const { property, errors } = require('./data');
+const { property } = require('./data');
+const errors = require('./errors');
 
 module.exports = {
   property,

@@ -10,8 +10,8 @@ module.exports = async (req, res, next) => {
     return next(errors.badRequest);
   }
 
-  if (await validate.email(email)) {
-    const { code } = await validate.email(email);
+  if (await validate.validateEmail(email)) {
+    const { code } = await validate.validateEmail(email);
     return next(errors[code]);
   }
 
