@@ -19,6 +19,11 @@ const errors = {
     code: 'unauthorized',
     message: 'Incorrect username or password',
   },
+  jwtMalformed: {
+    statusCode: 401,
+    code: 'unauthorized',
+    message: 'jwt malformed',
+  },
 };
 
 module.exports = errors;

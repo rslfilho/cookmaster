@@ -12,8 +12,12 @@ const createToken = (payload) => {
 };
 
 const validateToken = (token) => {
-  const decoded = jwt.verify(token, secret);
-  return decoded;
+  try {
+    const decoded = jwt.verify(token, secret);
+    return decoded;
+  } catch (err) {
+    return err;
+  }
 };
 
 module.exports = {

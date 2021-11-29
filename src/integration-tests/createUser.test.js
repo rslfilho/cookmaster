@@ -11,28 +11,31 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('POST /users', () => {
+  let connectionMock;
+
+  before(async () => {
+    connectionMock = await mongoDbMock.connection();
+
+    sinon.stub(MongoClient, 'connect')
+      .resolves(connectionMock);
+  });
+
+  after(async () => {
+    MongoClient.connect.restore();
+  });
+
   describe('Quando o campo "name" não vem na requisição', () => {
     let response = {};
 
     before(async () => {
-      const connectionMock = await mongoDbMock.connection();
-
-      sinon.stub(MongoClient, 'connect')
-          .resolves(connectionMock);
-
       response = await chai.request(app)
         .post('/users')
         .send({
-            name: '',
-            email: 'email@email.com',
-            password: 'senha123',
+          name: '',
+          email: 'email@email.com',
+          password: 'senha123',
         });
     });
-
-    after(async () => {
-      MongoClient.connect.restore();
-    });
-
 
     it('retorna o código de status 400', () => {
       expect(response).to.have.status(400);
@@ -57,11 +60,6 @@ describe('POST /users', () => {
     let response = {};
 
     before(async () => {
-      const connectionMock = await mongoDbMock.connection();
-
-      sinon.stub(MongoClient, 'connect')
-          .resolves(connectionMock);
-
       response = await chai.request(app)
         .post('/users')
         .send({
@@ -70,11 +68,6 @@ describe('POST /users', () => {
             password: 'senha123',
         });
     });
-
-    after(async () => {
-      MongoClient.connect.restore();
-    });
-
 
     it('retorna o código de status 400', () => {
       expect(response).to.have.status(400);
@@ -99,11 +92,6 @@ describe('POST /users', () => {
     let response = {};
 
     before(async () => {
-      const connectionMock = await mongoDbMock.connection();
-
-      sinon.stub(MongoClient, 'connect')
-          .resolves(connectionMock);
-
       response = await chai.request(app)
         .post('/users')
         .send({
@@ -112,11 +100,6 @@ describe('POST /users', () => {
             password: 'senha123',
         });
     });
-
-    after(async () => {
-      MongoClient.connect.restore();
-    });
-
 
     it('retorna o código de status 400', () => {
       expect(response).to.have.status(400);
@@ -141,11 +124,6 @@ describe('POST /users', () => {
     let response = {};
 
     before(async () => {
-      const connectionMock = await mongoDbMock.connection();
-
-      sinon.stub(MongoClient, 'connect')
-          .resolves(connectionMock);
-
       response = await chai.request(app)
         .post('/users')
         .send({
@@ -154,11 +132,6 @@ describe('POST /users', () => {
             password: '',
         });
     });
-
-    after(async () => {
-      MongoClient.connect.restore();
-    });
-
 
     it('retorna o código de status 400', () => {
       expect(response).to.have.status(400);
@@ -181,14 +154,8 @@ describe('POST /users', () => {
 
   describe('Quando o campo "email" não é único', () => {
     let response = {};
-    let connectionMock;
 
     before(async () => {
-      connectionMock = await mongoDbMock.connection();
-
-      sinon.stub(MongoClient, 'connect')
-          .resolves(connectionMock);
-
       await chai.request(app)
         .post('/users')
         .send({
@@ -204,11 +171,6 @@ describe('POST /users', () => {
             email: 'email@email.com',
             password: 'senha123',
         });
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      await connectionMock.db('Cookmaster').collection('users').drop();
     });
 
     it('retorna o código de status 409', () => {
@@ -234,22 +196,13 @@ describe('POST /users', () => {
     let response = {};
 
     before(async () => {
-      const connectionMock = await mongoDbMock.connection();
-
-      sinon.stub(MongoClient, 'connect')
-          .resolves(connectionMock);
-
       response = await chai.request(app)
         .post('/users')
         .send({
-            name: 'Usuário',
-            email: 'email@email.com',
+            name: 'Roberval Filho',
+            email: 'rslfilho@teste.ocm',
             password: 'senha123',
         });
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
     });
 
     it('retorna o código de status 201', () => {

@@ -8,7 +8,7 @@ const getByEmailModel = require('./getByEmail');
 
 module.exports = {
   collection: (collection) => ({
-    create: async (doc, role) => createModel(collection, doc, role),
+    create: async (doc) => createModel(collection, doc),
     // getById: async (id) => getByIdModel(collection, id),
     getByEmail: async (email) => getByEmailModel(collection, email),
     // getAll: async () => getAllModel(collection),

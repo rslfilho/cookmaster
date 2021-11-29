@@ -12,8 +12,10 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('POST /login', () => {
+  let connectionMock;
+
   before(async () => {
-    const connectionMock = await mongoDbMock.connection();
+    connectionMock = await mongoDbMock.connection();
 
     sinon.stub(MongoClient, 'connect')
       .resolves(connectionMock);
@@ -27,7 +29,7 @@ describe('POST /login', () => {
     });
   });
 
-  after(() => {
+  after(async () => {
     MongoClient.connect.restore();
   });
 
