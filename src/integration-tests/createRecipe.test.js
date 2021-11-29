@@ -40,6 +40,7 @@ describe('POST /recipes', () => {
 
   after(async () => {
     MongoClient.connect.restore();
+    await connectionMock.db('Cookmaster').collection('recipes').deleteMany({});
   });
 
   describe('Quando o campo "name" não vem na requisição', () => {
