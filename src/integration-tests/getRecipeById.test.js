@@ -10,17 +10,13 @@ chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('GET /recipes', () => {
+describe('GET /recipes/:id', () => {
   let connectionMock;
+  let recipeId;
   const recipeMock1 = {
     name: 'Receita Teste 1',
     ingredients: 'Farinha, Manteiga e Açucar',
     preparation: 'Farinha + Manteiga e depois Açucar',
-  };
-  const recipeMock2 = {
-    name: 'Receita Teste 2',
-    ingredients: 'Farinha, Manteiga',
-    preparation: 'Farinha + Manteiga e Fim',
   };
 
   before(async () => {
@@ -44,45 +40,66 @@ describe('GET /recipes', () => {
         password: 'senha123',
       });
 
-    await chai.request(app)
+    const { body: { recipe: { _id } } } = await chai.request(app)
       .post('/recipes')
       .set('Authorization', token)
       .send(recipeMock1);
 
-    await chai.request(app)
-      .post('/recipes')
-      .set('Authorization', token)
-      .send(recipeMock2);
+    recipeId = _id;
   });
 
   after(async () => {
     MongoClient.connect.restore();
     await connectionMock.db('Cookmaster').collection('recipes').deleteMany({});
   });
+  
+  describe('não será possível listar uma receita pelo ID', () => {
+    describe('quando a receita não existe', () => {
+      let response;
+      const invalidId = '507f1f77bcf86cd799439011';
 
-  describe('será possível listar todas as receitas cadastradas', () => {
+      before(async () => {
+        response = await chai.request(app)
+          .get(`/recipes/${invalidId}`);
+      });
+
+      it('retorna o código de status 404', () => {
+        expect(response).to.have.status(404);
+      });
+  
+      it('retorna um objeto', () => {
+        expect(response.body).to.be.a('object');
+      });
+  
+      it('o objeto possui a propriedade "message"', () => {
+        expect(response.body).to.have.property('message');
+      });
+  
+      it('a propriedade "message" possui o texto "recipe not found"', () => {
+        expect(response.body.message).to.be.equal('recipe not found');
+      });
+    });
+  });
+
+  describe('será possível listar uma receita pelo ID', () => {
     describe('quando o usuário não está logado (autenticado)', () => {
       let response;
       
       before(async () => {
         response = await chai.request(app)
-          .get('/recipes');
+          .get(`/recipes/${recipeId}`);
       });
 
       it('retorna o código de status 200', () => {
         expect(response).to.have.status(200);
       });
   
-      it('retorna um array', () => {
-        expect(response.body).to.be.an('array');
+      it('retorna um objeto', () => {
+        expect(response.body).to.be.an('object');
       });
   
-      it('o array possui 02 elementos', () => {
-        expect(response.body).to.have.length(2);
-      });
-  
-      it('o primeiro elemento do array ter as chaves "_id", "ingredients", "name", "preparation" e "userId"', () => {
-        expect(response.body[0]).to.have.all
+      it('o objeto do array ter as chaves "_id", "ingredients", "name", "preparation" e "userId"', () => {
+        expect(response.body).to.have.all
           .keys('_id', 'ingredients', 'name', 'preparation', 'userId');
       });
     });
@@ -99,7 +116,7 @@ describe('GET /recipes', () => {
           });
         
         response = await chai.request(app)
-          .get('/recipes')
+          .get(`/recipes/${recipeId}`)
           .set('Authorization', token)
       });
 
@@ -107,16 +124,12 @@ describe('GET /recipes', () => {
         expect(response).to.have.status(200);
       });
   
-      it('retorna um array', () => {
-        expect(response.body).to.be.an('array');
+      it('retorna um objeto', () => {
+        expect(response.body).to.be.an('object');
       });
   
-      it('o array possui 02 elementos', () => {
-        expect(response.body).to.have.length(2);
-      });
-  
-      it('o segundo elemento do array ter as chaves "_id", "ingredients", "name", "preparation" e "userId"', () => {
-        expect(response.body[1]).to.have.all
+      it('o objeto do array ter as chaves "_id", "ingredients", "name", "preparation" e "userId"', () => {
+        expect(response.body).to.have.all
           .keys('_id', 'ingredients', 'name', 'preparation', 'userId');
       });
     });

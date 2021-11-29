@@ -24,6 +24,11 @@ const errors = {
     code: 'unauthorized',
     message: 'jwt malformed',
   },
+  recipeNotFound: {
+    statusCode: 404,
+    code: 'not_found',
+    message: 'recipe not found',
+  },
 };
 
 module.exports = errors;
