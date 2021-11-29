@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http');
 const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
 
-const mongoDbMock = require('./connectionMock');
+const mongoDBMock = require('./connectionMock');
 const app = require('../api/app');
 
 chai.use(chaiHttp);
@@ -14,7 +14,7 @@ describe('POST /users', () => {
   let connectionMock;
 
   before(async () => {
-    connectionMock = await mongoDbMock.connection();
+    connectionMock = await mongoDBMock.connection();
 
     sinon.stub(MongoClient, 'connect')
       .resolves(connectionMock);
@@ -22,6 +22,9 @@ describe('POST /users', () => {
 
   after(async () => {
     MongoClient.connect.restore();
+    const db = await connectionMock.db('Cookmaster');
+    const users = await db.collection('users');
+    await users.deleteMany({});
   });
 
   describe('Quando o campo "name" não vem na requisição', () => {
@@ -95,7 +98,7 @@ describe('POST /users', () => {
       response = await chai.request(app)
         .post('/users')
         .send({
-            name: '',
+            name: 'Teste',
             email: 'email@email',
             password: 'senha123',
         });
@@ -156,6 +159,8 @@ describe('POST /users', () => {
     let response = {};
 
     before(async () => {
+      console.log(await connectionMock.db('Cookmaster').collection('users').find().toArray());
+
       await chai.request(app)
         .post('/users')
         .send({

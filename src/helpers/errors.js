@@ -29,6 +29,16 @@ const errors = {
     code: 'not_found',
     message: 'recipe not found',
   },
+  missingToken: {
+    statusCode: 401,
+    code: 'unauthorized',
+    message: 'missing auth token',
+  },
+  userNotCreatorOrAdmin: {
+    statusCode: 401,
+    code: 'unauthorized',
+    message: 'user is not the creator of recipe or admin',
+  },
 };
 
 module.exports = errors;

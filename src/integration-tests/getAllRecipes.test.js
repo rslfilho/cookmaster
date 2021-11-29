@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http');
 const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
 
-const mongoDbMock = require('./connectionMock');
+const mongoDBMock = require('./connectionMock');
 const app = require('../api/app');
 
 chai.use(chaiHttp);
@@ -24,10 +24,12 @@ describe('GET /recipes', () => {
   };
 
   before(async () => {
-    connectionMock = await mongoDbMock.connection();
+    connectionMock = await mongoDBMock.connection();
 
     sinon.stub(MongoClient, 'connect')
       .resolves(connectionMock);
+
+    await connectionMock.db('Cookmaster').collection('recipes').deleteMany({});
 
     await chai.request(app)
       .post('/users')
@@ -57,7 +59,11 @@ describe('GET /recipes', () => {
 
   after(async () => {
     MongoClient.connect.restore();
-    await connectionMock.db('Cookmaster').collection('recipes').deleteMany({});
+    const db = await connectionMock.db('Cookmaster');
+    const users = await db.collection('users');
+    const recipes = await db.collection('recipes');
+    await users.deleteMany({});
+    await recipes.deleteMany({});
   });
 
   describe('será possível listar todas as receitas cadastradas', () => {
@@ -77,7 +83,8 @@ describe('GET /recipes', () => {
         expect(response.body).to.be.an('array');
       });
   
-      it('o array possui 02 elementos', () => {
+      it('o array possui 02 elementos', async () => {
+        console.log(response.body);
         expect(response.body).to.have.length(2);
       });
   

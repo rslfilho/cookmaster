@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http');
 const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
 
-const mongoDbMock = require('./connectionMock');
+const mongoDBMock = require('./connectionMock');
 const app = require('../api/app');
 
 chai.use(chaiHttp);
@@ -20,7 +20,7 @@ describe('GET /recipes/:id', () => {
   };
 
   before(async () => {
-    connectionMock = await mongoDbMock.connection();
+    connectionMock = await mongoDBMock.connection();
 
     sinon.stub(MongoClient, 'connect')
       .resolves(connectionMock);
@@ -50,7 +50,11 @@ describe('GET /recipes/:id', () => {
 
   after(async () => {
     MongoClient.connect.restore();
-    await connectionMock.db('Cookmaster').collection('recipes').deleteMany({});
+    const db = await connectionMock.db('Cookmaster');
+    const users = await db.collection('users');
+    const recipes = await db.collection('recipes');
+    await users.deleteMany({});
+    await recipes.deleteMany({});
   });
   
   describe('não será possível listar uma receita pelo ID', () => {

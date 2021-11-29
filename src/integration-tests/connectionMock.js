@@ -6,9 +6,17 @@ const OPTIONS = {
   useUnifiedTopology: true,
 };
 
+let DBServer;
+let URLMock;
+
 const connection = async () => {
-  const DBServer = await MongoMemoryServer.create();
-  const URLMock = DBServer.getUri();
+  if (DBServer) {
+    URLMock = DBServer.getUri();
+    return MongoClient.connect(URLMock, OPTIONS);
+  }
+  
+  DBServer = await MongoMemoryServer.create();
+  URLMock = DBServer.getUri();
 
   return MongoClient.connect(URLMock, OPTIONS);
 };

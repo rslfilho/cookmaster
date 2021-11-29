@@ -13,9 +13,9 @@ const checkEmail = (email) => {
 };
 
 const validateEmail = async (email) => {
-  if (await emailExists(email)) return emailExists(email);
-
   if (checkEmail(email)) return checkEmail(email);
+  
+  if (await emailExists(email)) return emailExists(email);
 };
 
 const validateLogin = async (email, password) => {
