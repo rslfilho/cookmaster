@@ -84,7 +84,6 @@ describe('GET /recipes', () => {
       });
   
       it('o array possui 02 elementos', async () => {
-        console.log(response.body);
         expect(response.body).to.have.length(2);
       });
   

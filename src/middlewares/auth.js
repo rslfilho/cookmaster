@@ -7,6 +7,8 @@ module.exports = (req, _res, next) => {
     if (!token) return next(errors.missingToken);
 
     const decoded = jwt.validateToken(token);
+
+  if ('message' in decoded) return next(errors.jwtMalformed);
     
     delete decoded.exp;
     delete decoded.iat;

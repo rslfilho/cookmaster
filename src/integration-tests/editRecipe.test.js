@@ -10,19 +10,23 @@ chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('DELETE /recipes/:id', () => {
+describe('PUT /recipes/:id', () => {
   let token;
   let connectionMock;
   let recipeId;
-  let recipeId2;
   const recipeMock = {
     name: 'Receita Teste',
     ingredients: 'Farinha, Manteiga e Açucar',
     preparation: 'Farinha + Manteiga e depois Açucar',
   };
+  const recipeUpdateMock = {
+    name: 'Receita Teste 33',
+    ingredients: 'Farinha, Manteiga e Açucar',
+    preparation: 'Farinha + Manteiga e depois Açucar 123',
+  };
   const adminMock = {
     name: 'Admin Deleta Receita',
-    email: 'admindeleta@email.com',
+    email: 'adminedita@email.com',
     password: 'senha123',
     role: 'admin',
   };
@@ -38,15 +42,15 @@ describe('DELETE /recipes/:id', () => {
     await chai.request(app)
       .post('/users')
       .send({
-        name: 'Usuário Deleta Mensagem',
-        email: 'deletamensagem@teste.com',
+        name: 'Usuário Edita Mensagem',
+        email: 'editamensagem@teste.com',
         password: 'senha123',
       });
     
     const response = await chai.request(app)
       .post('/login')
       .send({
-        email: 'deletamensagem@teste.com',
+        email: 'editamensagem@teste.com',
         password: 'senha123',
       });
     
@@ -58,13 +62,6 @@ describe('DELETE /recipes/:id', () => {
       .send(recipeMock)
     
     recipeId = _id;
-
-    const { body: { recipe: { _id: _id2 } } } = await chai.request(app)
-      .post('/recipes')
-      .set('Authorization', token)
-      .send(recipeMock)
-    
-    recipeId2 = _id2;
   });
 
   after(async () => {
@@ -82,7 +79,7 @@ describe('DELETE /recipes/:id', () => {
 
     before(async () => {
       response = await chai.request(app)
-        .delete(`/recipes/${recipeId}`);
+        .put(`/recipes/${recipeId}`);
     });
 
     it('retorna o código de status 401', () => {
@@ -102,54 +99,83 @@ describe('DELETE /recipes/:id', () => {
     });
   });
 
-  describe('quando o usuário está autenticado e é o criador da receita', () => {
+  describe('quando o token enviado é invalido', () => {
     let response = {};
-    let response2 = {};
+    const invalidToken = 'Dfasdjfn;JNf;djsaf;NLkfdajf;'
 
     before(async () => {
       response = await chai.request(app)
-        .delete(`/recipes/${recipeId}`)
-        .set('Authorization', token);
-
-      response2 = await chai.request(app)
-        .get(`/recipes/${recipeId}`);
+        .put(`/recipes/${recipeId}`)
+        .set('Authorization', invalidToken);
     });
 
-    it('retorna o código de status 204', () => {
-      expect(response).to.have.status(204);
+    it('retorna o código de status 401', () => {
+      expect(response).to.have.status(401);
     });
 
-    it('a receita não está mais no banco de dados', () => {
-      expect(response2).to.have.status(404);
+    it('retorna um objeto', () => {
+      expect(response.body).to.be.a('object');
+    });
+
+    it('o objeto possui a propriedade "message"', () => {
+      expect(response.body).to.have.property('message');
+    });
+
+    it('a propriedade "message" possui o texto "jwt malformed"', () => {
+      expect(response.body.message).to.be.equal('jwt malformed');
+    });
+  });
+
+  describe('quando o usuário está autenticado e é o criador da receita', () => {
+    let response = {};
+
+    before(async () => {
+      response = await chai.request(app)
+        .put(`/recipes/${recipeId}`)
+        .set('Authorization', token)
+        .send(recipeUpdateMock);
+    });
+
+    it('retorna o código de status 200', () => {
+      expect(response).to.have.status(200);
+    });
+
+    it('retorna um objeto', () => {
+      expect(response.body).to.be.an('object');
+    });
+
+    it('o objecto "recipe" possui as chaves "_id", "name", "ingredients", "preparation" e "userId', () => {
+      expect(response.body).to.have.all.keys('_id', 'name', 'ingredients', 'preparation', 'userId');
     });
   });
 
   describe('quando o usuário está autenticado e é um admin', () => {
     let response = {};
-    let response2 = {};
 
     before(async () => {
       const { body: { token: adminToken } } = await chai.request(app)
         .post('/login')
         .send({
-          email: 'admindeleta@email.com',
+          email: 'adminedita@email.com',
           password: 'senha123',
         });
       
       response = await chai.request(app)
-        .delete(`/recipes/${recipeId2}`)
-        .set('Authorization', adminToken);
-
-      response2 = await chai.request(app)
-        .get(`/recipes/${recipeId}`);
+        .put(`/recipes/${recipeId}`)
+        .set('Authorization', adminToken)
+        .send(recipeUpdateMock);
     });
 
-    it('retorna o código de status 204', () => {
-      expect(response).to.have.status(204);
+    it('retorna o código de status 200', () => {
+      expect(response).to.have.status(200);
     });
 
-    it('a receita não está mais no banco de dados', () => {
-      expect(response2).to.have.status(404);
+    it('retorna um objeto', () => {
+      expect(response.body).to.be.an('object');
+    });
+
+    it('o objecto "recipe" possui as chaves "_id", "name", "ingredients", "preparation" e "userId', () => {
+      expect(response.body).to.have.all.keys('_id', 'name', 'ingredients', 'preparation', 'userId');
     });
   });
 });

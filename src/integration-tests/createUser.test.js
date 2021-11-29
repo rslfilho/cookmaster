@@ -159,8 +159,6 @@ describe('POST /users', () => {
     let response = {};
 
     before(async () => {
-      console.log(await connectionMock.db('Cookmaster').collection('users').find().toArray());
-
       await chai.request(app)
         .post('/users')
         .send({
