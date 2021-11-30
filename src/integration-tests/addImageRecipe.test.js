@@ -73,7 +73,6 @@ describe('PUT /recipes/:id/image', () => {
 
   after(async () => {
     MongoClient.connect.restore();
-    const db = await connectionMock.db('Cookmaster');
     const users = await db.collection('users');
     const recipes = await db.collection('recipes');
     await users.deleteMany({});

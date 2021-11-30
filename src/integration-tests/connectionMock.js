@@ -11,7 +11,6 @@ let URLMock;
 
 const connection = async () => {
   if (DBServer) {
-    URLMock = DBServer.getUri();
     return MongoClient.connect(URLMock, OPTIONS);
   }
   
