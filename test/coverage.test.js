@@ -1,7 +1,7 @@
 const { promisify } = require('util');
 const { readFile } = require("fs").promises;
 const { resolve } = require("path");
-
+jest.setTimeout(30000);
 const exec = promisify(require('child_process').exec);
 
 let testResults;
