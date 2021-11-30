@@ -39,6 +39,11 @@ const errors = {
     code: 'unauthorized',
     message: 'user is not the creator of recipe or admin',
   },
+  onlyAdmins: {
+    statusCode: 403,
+    code: 'forbidden',
+    message: 'Only admins can register new admins',
+  },
 };
 
 module.exports = errors;
