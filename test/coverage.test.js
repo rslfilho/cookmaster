@@ -6,27 +6,37 @@ const exec = promisify(require('child_process').exec);
 
 let testResults;
 
-beforeAll(async () =>{
+const executeDevTests = async () => {
+  await exec(`npm run dev:test:coverage:json &> /dev/null`)
+      .catch(() => true);
+    
+  await new Promise(res => setTimeout(()=> res(true), 10000));
+  
+  const path = resolve("coverage", "coverage-summary.json");
+  
   try {
-    await exec(`npm run dev:test:coverage:json &> /dev/null`);
-    
-    const path = resolve("coverage", "coverage-summary.json");
-    
     const lines = await readFile(path, "utf-8")
       .then((coverageTxt) => JSON.parse(coverageTxt))
       .then(({ total: { lines } }) => lines );
-  
+
     testResults = {
       path,
       lines,
     };
   } catch (error) {
-    throw new Error(`Não foi possível fazer a leitura da cobertura\n${error.message}`);
+    console.error(`Não foi possível executar/ler o teste cobertura\n\n${error}\n\nTentando novamente...\n`);
+    return executeDevTests();
   }
+}
+
+beforeAll(async () =>{
+  await exec('rm -rf coverage .nyc_output').catch(()=> true);
+  
+  await executeDevTests();
 });
 
 afterAll(async () => {
-  await exec('rm -rf coverage .nyc_output');
+  await exec('rm -rf coverage .nyc_output').catch(()=> true);
 });
 
 describe
