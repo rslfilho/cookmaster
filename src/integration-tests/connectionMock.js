@@ -15,7 +15,8 @@ const connection = async () => {
   }
   
   DBServer = new MongoMemoryServer();
-  URLMock = await DBServer.getUri();
+  await DBServer.start();
+  URLMock = DBServer.getUri();
 
   return MongoClient.connect(URLMock, OPTIONS);
 };
