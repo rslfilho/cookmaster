@@ -4,7 +4,7 @@
   "description": "Você já usa o GitHub diariamente para desenvolver os exercícios, certo? Agora, para desenvolver os projetos, você deverá seguir as instruções a seguir. Fique atento a cada passo, e se tiver qualquer dúvida, nos envie por Slack! #vqv 🚀",
   "main": "./src/api/server.js",
   "scripts": {
-    "test": "jest --runInBand --detectOpenHandles --testTimeout=30000 --forceExit",
+    "test": "jest --runInBand --detectOpenHandles --forceExit",
     "start": "node .",
     "dev": "node-dev .",
     "dev:test": "mocha ./src/integration-tests/**/*$NAME*.{test,spec}.js --timeout=3000 --exit",
