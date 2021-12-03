@@ -1,23 +1,15 @@
 const { jwt, errors } = require('../helpers');
 
 module.exports = (req, _res, next) => {
-  try {
-    const { authorization: token } = req.headers;
+  const { authorization: token } = req.headers;
 
-    if (!token) return next(errors.missingToken);
+  if (!token) return next(errors.missingToken);
 
-    const decoded = jwt.validateToken(token);
+  const data = jwt.validateToken(token);
 
-  if ('message' in decoded) return next(errors.jwtMalformed);
-    
-    delete decoded.exp;
-    delete decoded.iat;
+  if ('message' in data) return next(errors.jwtMalformed);
+  
+  req.user = data;
 
-    req.user = decoded;
-
-    next();
-  } catch (err) {
-    if (err.message === 'jwt malformed') return next(errors.jwtMalformed);
-    next(err);
-  }
+  next();
 };

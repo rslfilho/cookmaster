@@ -7,14 +7,14 @@ const jwtConfig = {
 };
 
 const createToken = (payload) => {
-  const token = jwt.sign(payload, secret, jwtConfig);
+  const token = jwt.sign({ data: payload }, secret, jwtConfig);
   return token;
 };
 
 const validateToken = (token) => {
   try {
-    const decoded = jwt.verify(token, secret);
-    return decoded;
+    const { data } = jwt.verify(token, secret);
+    return data;
   } catch (err) {
     return err;
   }
