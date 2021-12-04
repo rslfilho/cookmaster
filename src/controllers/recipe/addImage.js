@@ -5,11 +5,8 @@ const { errors } = require('../../helpers');
 module.exports = async (req, res, next) => {
   const { id: recipeId } = req.params;
   const { _id: userIdEditing } = req.user;
-  const { file } = req;
 
-  const path = file.path.split('master/')[1];
-
-  const fileUrl = `localhost:3000/${path}`;
+  const fileUrl = `localhost:3000/src/uploads/${recipeId}.jpeg`;
 
   const response = await recipeService.addImage(recipeId, userIdEditing, fileUrl);
 
